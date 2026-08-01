@@ -1,0 +1,262 @@
+method,split,trajectory,wind,mean,std,source_line
+PID,test,Hover,Wind I,0.213,0.029,396
+OMAC,test,Hover,Wind I,0.102,0.015,396
+Neural-Fly,test,Hover,Wind I,0.095,0.013,396
+OoD-Control,test,Hover,Wind I,0.083,0.011,396
+Transformer,test,Hover,Wind I,0.218,0.027,396
+AeroACE,test,Hover,Wind I,0.048,0.006,396
+PID,test,Hover,Wind II,0.295,0.028,397
+OMAC,test,Hover,Wind II,0.139,0.022,397
+Neural-Fly,test,Hover,Wind II,0.128,0.020,397
+OoD-Control,test,Hover,Wind II,0.111,0.016,397
+Transformer,test,Hover,Wind II,0.291,0.029,397
+AeroACE,test,Hover,Wind II,0.056,0.006,397
+PID,test,Hover,Wind III,0.352,0.050,398
+OMAC,test,Hover,Wind III,0.161,0.023,398
+Neural-Fly,test,Hover,Wind III,0.148,0.020,398
+OoD-Control,test,Hover,Wind III,0.129,0.017,398
+Transformer,test,Hover,Wind III,0.357,0.047,398
+AeroACE,test,Hover,Wind III,0.066,0.007,398
+PID,test,Figure-8,Wind I,0.254,0.042,400
+OMAC,test,Figure-8,Wind I,0.132,0.019,400
+Neural-Fly,test,Figure-8,Wind I,0.125,0.017,400
+OoD-Control,test,Figure-8,Wind I,0.113,0.014,400
+Transformer,test,Figure-8,Wind I,0.259,0.039,400
+AeroACE,test,Figure-8,Wind I,0.092,0.008,400
+PID,test,Figure-8,Wind II,0.346,0.043,401
+OMAC,test,Figure-8,Wind II,0.173,0.029,401
+Neural-Fly,test,Figure-8,Wind II,0.161,0.027,401
+OoD-Control,test,Figure-8,Wind II,0.143,0.023,401
+Transformer,test,Figure-8,Wind II,0.348,0.040,401
+AeroACE,test,Figure-8,Wind II,0.096,0.009,401
+PID,test,Figure-8,Wind III,0.398,0.056,402
+OMAC,test,Figure-8,Wind III,0.227,0.037,402
+Neural-Fly,test,Figure-8,Wind III,0.206,0.032,402
+OoD-Control,test,Figure-8,Wind III,0.189,0.029,402
+Transformer,test,Figure-8,Wind III,0.402,0.053,402
+AeroACE,test,Figure-8,Wind III,0.105,0.011,402
+PID,test,Spiral,Wind I,0.254,0.042,404
+OMAC,test,Spiral,Wind I,0.155,0.026,404
+Neural-Fly,test,Spiral,Wind I,0.142,0.022,404
+OoD-Control,test,Spiral,Wind I,0.132,0.019,404
+Transformer,test,Spiral,Wind I,0.254,0.043,404
+AeroACE,test,Spiral,Wind I,0.093,0.008,404
+PID,test,Spiral,Wind II,0.346,0.043,405
+OMAC,test,Spiral,Wind II,0.207,0.037,405
+Neural-Fly,test,Spiral,Wind II,0.188,0.033,405
+OoD-Control,test,Spiral,Wind II,0.173,0.029,405
+Transformer,test,Spiral,Wind II,0.343,0.042,405
+AeroACE,test,Spiral,Wind II,0.103,0.011,405
+PID,test,Spiral,Wind III,0.398,0.056,406
+OMAC,test,Spiral,Wind III,0.226,0.037,406
+Neural-Fly,test,Spiral,Wind III,0.206,0.032,406
+OoD-Control,test,Spiral,Wind III,0.189,0.029,406
+Transformer,test,Spiral,Wind III,0.395,0.054,406
+AeroACE,test,Spiral,Wind III,0.105,0.011,406
+PID,test,Sin-forward,Wind I,0.199,0.038,408
+OMAC,test,Sin-forward,Wind I,0.107,0.019,408
+Neural-Fly,test,Sin-forward,Wind I,0.099,0.016,408
+OoD-Control,test,Sin-forward,Wind I,0.093,0.015,408
+Transformer,test,Sin-forward,Wind I,0.228,0.040,408
+AeroACE,test,Sin-forward,Wind I,0.075,0.005,408
+PID,test,Sin-forward,Wind II,0.324,0.078,409
+OMAC,test,Sin-forward,Wind II,0.170,0.069,409
+Neural-Fly,test,Sin-forward,Wind II,0.155,0.065,409
+OoD-Control,test,Sin-forward,Wind II,0.152,0.086,409
+Transformer,test,Sin-forward,Wind II,0.316,0.086,409
+AeroACE,test,Sin-forward,Wind II,0.080,0.009,409
+PID,test,Sin-forward,Wind III,0.403,0.069,410
+OMAC,test,Sin-forward,Wind III,0.250,0.069,410
+Neural-Fly,test,Sin-forward,Wind III,0.235,0.066,410
+OoD-Control,test,Sin-forward,Wind III,0.197,0.055,410
+Transformer,test,Sin-forward,Wind III,0.400,0.069,410
+AeroACE,test,Sin-forward,Wind III,0.090,0.010,410
+PID,test,Terrain,Wind I,0.226,0.040,412
+OMAC,test,Terrain,Wind I,0.145,0.035,412
+Neural-Fly,test,Terrain,Wind I,0.141,0.033,412
+OoD-Control,test,Terrain,Wind I,0.131,0.030,412
+Transformer,test,Terrain,Wind I,0.198,0.038,412
+AeroACE,test,Terrain,Wind I,0.068,0.004,412
+PID,test,Terrain,Wind II,0.320,0.039,413
+OMAC,test,Terrain,Wind II,0.205,0.040,413
+Neural-Fly,test,Terrain,Wind II,0.170,0.046,413
+OoD-Control,test,Terrain,Wind II,0.165,0.044,413
+Transformer,test,Terrain,Wind II,0.324,0.039,413
+AeroACE,test,Terrain,Wind II,0.077,0.005,413
+PID,test,Terrain,Wind III,0.381,0.052,414
+OMAC,test,Terrain,Wind III,0.283,0.070,414
+Neural-Fly,test,Terrain,Wind III,0.239,0.061,414
+OoD-Control,test,Terrain,Wind III,0.204,0.037,414
+Transformer,test,Terrain,Wind III,0.383,0.052,414
+AeroACE,test,Terrain,Wind III,0.090,0.014,414
+DMRAC,test,Hover,Wind I,0.257,0.059,1250
+NeuroBEM,test,Hover,Wind I,0.219,0.044,1250
+PI-TCN,test,Hover,Wind I,0.178,0.052,1250
+MANN,test,Hover,Wind I,0.267,0.039,1250
+Agile,test,Hover,Wind I,0.194,0.026,1250
+DMRAC,test,Hover,Wind II,0.375,0.067,1251
+NeuroBEM,test,Hover,Wind II,0.335,0.064,1251
+PI-TCN,test,Hover,Wind II,0.276,0.062,1251
+MANN,test,Hover,Wind II,0.361,0.054,1251
+Agile,test,Hover,Wind II,0.245,0.030,1251
+DMRAC,test,Hover,Wind III,0.517,0.103,1252
+NeuroBEM,test,Hover,Wind III,0.490,0.101,1252
+PI-TCN,test,Hover,Wind III,0.372,0.076,1252
+MANN,test,Hover,Wind III,0.478,0.068,1252
+Agile,test,Hover,Wind III,0.298,0.035,1252
+DMRAC,test,Figure-8,Wind I,0.271,0.057,1254
+NeuroBEM,test,Figure-8,Wind I,0.228,0.045,1254
+PI-TCN,test,Figure-8,Wind I,0.185,0.048,1254
+MANN,test,Figure-8,Wind I,0.280,0.083,1254
+Agile,test,Figure-8,Wind I,0.243,0.052,1254
+DMRAC,test,Figure-8,Wind II,0.408,0.068,1255
+NeuroBEM,test,Figure-8,Wind II,0.338,0.058,1255
+PI-TCN,test,Figure-8,Wind II,0.287,0.064,1255
+MANN,test,Figure-8,Wind II,0.355,0.085,1255
+Agile,test,Figure-8,Wind II,0.305,0.056,1255
+DMRAC,test,Figure-8,Wind III,0.517,0.103,1256
+NeuroBEM,test,Figure-8,Wind III,0.386,0.074,1256
+PI-TCN,test,Figure-8,Wind III,0.373,0.075,1256
+MANN,test,Figure-8,Wind III,0.475,0.106,1256
+Agile,test,Figure-8,Wind III,0.378,0.065,1256
+DMRAC,test,Spiral,Wind I,0.389,0.084,1258
+NeuroBEM,test,Spiral,Wind I,0.284,0.063,1258
+PI-TCN,test,Spiral,Wind I,0.256,0.064,1258
+MANN,test,Spiral,Wind I,0.315,0.086,1258
+Agile,test,Spiral,Wind I,0.253,0.063,1258
+DMRAC,test,Spiral,Wind II,0.482,0.089,1259
+NeuroBEM,test,Spiral,Wind II,0.393,0.069,1259
+PI-TCN,test,Spiral,Wind II,0.343,0.077,1259
+MANN,test,Spiral,Wind II,0.451,0.084,1259
+Agile,test,Spiral,Wind II,0.304,0.068,1259
+DMRAC,test,Spiral,Wind III,0.568,0.125,1260
+NeuroBEM,test,Spiral,Wind III,0.431,0.087,1260
+PI-TCN,test,Spiral,Wind III,0.412,0.089,1260
+MANN,test,Spiral,Wind III,0.587,0.126,1260
+Agile,test,Spiral,Wind III,0.389,0.072,1260
+DMRAC,test,Sin-forward,Wind I,0.365,0.085,1262
+NeuroBEM,test,Sin-forward,Wind I,0.278,0.049,1262
+PI-TCN,test,Sin-forward,Wind I,0.251,0.038,1262
+MANN,test,Sin-forward,Wind I,0.345,0.076,1262
+Agile,test,Sin-forward,Wind I,0.269,0.040,1262
+DMRAC,test,Sin-forward,Wind II,0.497,0.090,1263
+NeuroBEM,test,Sin-forward,Wind II,0.388,0.052,1263
+PI-TCN,test,Sin-forward,Wind II,0.350,0.050,1263
+MANN,test,Sin-forward,Wind II,0.408,0.092,1263
+Agile,test,Sin-forward,Wind II,0.325,0.045,1263
+DMRAC,test,Sin-forward,Wind III,0.649,0.114,1264
+NeuroBEM,test,Sin-forward,Wind III,0.422,0.071,1264
+PI-TCN,test,Sin-forward,Wind III,0.423,0.061,1264
+MANN,test,Sin-forward,Wind III,0.455,0.127,1264
+Agile,test,Sin-forward,Wind III,0.387,0.053,1264
+DMRAC,test,Terrain,Wind I,0.634,0.205,1266
+NeuroBEM,test,Terrain,Wind I,0.225,0.048,1266
+PI-TCN,test,Terrain,Wind I,0.247,0.044,1266
+MANN,test,Terrain,Wind I,0.269,0.051,1266
+Agile,test,Terrain,Wind I,0.253,0.038,1266
+DMRAC,test,Terrain,Wind II,0.743,0.277,1267
+NeuroBEM,test,Terrain,Wind II,0.340,0.057,1267
+PI-TCN,test,Terrain,Wind II,0.358,0.060,1267
+MANN,test,Terrain,Wind II,0.319,0.065,1267
+Agile,test,Terrain,Wind II,0.326,0.045,1267
+DMRAC,test,Terrain,Wind III,0.805,0.373,1268
+NeuroBEM,test,Terrain,Wind III,0.386,0.075,1268
+PI-TCN,test,Terrain,Wind III,0.412,0.073,1268
+MANN,test,Terrain,Wind III,0.456,0.120,1268
+Agile,test,Terrain,Wind III,0.392,0.050,1268
+Pi-Transformer,train,Hover,,0.086,0.015,1297
+Pi-Transformer,train,Figure-8,,0.126,0.014,1297
+Pi-Transformer,train,Spiral,,0.130,0.018,1297
+Pi-Transformer,train,Sin-forward,,0.124,0.014,1297
+Pi-Transformer,train,Terrain,,0.133,0.026,1297
+Pi-Transformer,test,Hover,,0.307,0.049,1298
+Pi-Transformer,test,Figure-8,,0.359,0.058,1298
+Pi-Transformer,test,Spiral,,0.346,0.056,1298
+Pi-Transformer,test,Sin-forward,,0.328,0.054,1298
+Pi-Transformer,test,Terrain,,0.339,0.058,1298
+PowerFormer,train,Hover,,0.125,0.032,1300
+PowerFormer,train,Figure-8,,0.164,0.034,1300
+PowerFormer,train,Spiral,,0.165,0.036,1300
+PowerFormer,train,Sin-forward,,0.136,0.032,1300
+PowerFormer,train,Terrain,,0.147,0.038,1300
+PowerFormer,test,Hover,,0.351,0.106,1301
+PowerFormer,test,Figure-8,,0.389,0.127,1301
+PowerFormer,test,Spiral,,0.455,0.156,1301
+PowerFormer,test,Sin-forward,,0.368,0.115,1301
+PowerFormer,test,Terrain,,0.393,0.158,1301
+Causal Transformer,train,Hover,,0.084,0.026,1303
+Causal Transformer,train,Figure-8,,0.135,0.036,1303
+Causal Transformer,train,Spiral,,0.132,0.035,1303
+Causal Transformer,train,Sin-forward,,0.119,0.028,1303
+Causal Transformer,train,Terrain,,0.114,0.028,1303
+Causal Transformer,test,Hover,,0.321,0.073,1304
+Causal Transformer,test,Figure-8,,0.483,0.163,1304
+Causal Transformer,test,Spiral,,0.451,0.122,1304
+Causal Transformer,test,Sin-forward,,0.343,0.105,1304
+Causal Transformer,test,Terrain,,0.389,0.120,1304
+Causal Attn. Masking,train,Hover,,0.102,0.048,1306
+Causal Attn. Masking,train,Figure-8,,0.189,0.052,1306
+Causal Attn. Masking,train,Spiral,,0.176,0.044,1306
+Causal Attn. Masking,train,Sin-forward,,0.168,0.038,1306
+Causal Attn. Masking,train,Terrain,,0.174,0.036,1306
+Causal Attn. Masking,test,Hover,,0.297,0.092,1307
+Causal Attn. Masking,test,Figure-8,,0.424,0.102,1307
+Causal Attn. Masking,test,Spiral,,0.412,0.118,1307
+Causal Attn. Masking,test,Sin-forward,,0.348,0.099,1307
+Causal Attn. Masking,test,Terrain,,0.362,0.106,1307
+Pinnsformer,train,Hover,,0.076,0.018,1309
+Pinnsformer,train,Figure-8,,0.126,0.016,1309
+Pinnsformer,train,Spiral,,0.128,0.020,1309
+Pinnsformer,train,Sin-forward,,0.114,0.019,1309
+Pinnsformer,train,Terrain,,0.109,0.019,1309
+Pinnsformer,test,Hover,,0.262,0.072,1310
+Pinnsformer,test,Figure-8,,0.386,0.084,1310
+Pinnsformer,test,Spiral,,0.393,0.076,1310
+Pinnsformer,test,Sin-forward,,0.338,0.068,1310
+Pinnsformer,test,Terrain,,0.326,0.070,1310
+AeroACE,train,Hover,,0.056,0.006,1312
+AeroACE,train,Figure-8,,0.096,0.009,1312
+AeroACE,train,Spiral,,0.103,0.011,1312
+AeroACE,train,Sin-forward,,0.080,0.009,1312
+AeroACE,train,Terrain,,0.077,0.005,1312
+AeroACE,test,Hover,,0.072,0.011,1313
+AeroACE,test,Figure-8,,0.110,0.011,1313
+AeroACE,test,Spiral,,0.113,0.013,1313
+AeroACE,test,Sin-forward,,0.098,0.011,1313
+AeroACE,test,Terrain,,0.096,0.013,1313
+RTN-MPC,test,Figure-8,Wind I,1.206,0.054,1351
+RTN-MPC,test,Figure-8,Wind II,1.628,0.126,1351
+RTN-MPC,test,Figure-8,Wind III,2.337,0.417,1351
+MLMPC,test,Figure-8,Wind I,0.923,0.129,1352
+MLMPC,test,Figure-8,Wind II,1.558,0.286,1352
+MLMPC,test,Figure-8,Wind III,2.124,0.356,1352
+GRU,test,Hover,Wind III,0.079,0.009,540
+GRU,test,Figure-8,Wind III,0.218,0.279,540
+GRU,test,Spiral,Wind III,0.139,0.011,540
+GRU,test,Sin-forward,Wind III,0.156,0.015,540
+GRU,test,Terrain,Wind III,0.161,0.016,540
+Transformer replacement,test,Hover,Wind III,0.074,0.008,541
+Transformer replacement,test,Figure-8,Wind III,0.128,0.023,541
+Transformer replacement,test,Spiral,Wind III,0.123,0.015,541
+Transformer replacement,test,Sin-forward,Wind III,0.115,0.013,541
+Transformer replacement,test,Terrain,Wind III,0.106,0.014,541
+Mamba,test,Hover,Wind III,0.336,0.050,542
+Mamba,test,Figure-8,Wind III,0.379,0.050,542
+Mamba,test,Spiral,Wind III,0.420,0.063,542
+Mamba,test,Sin-forward,Wind III,0.346,0.051,542
+Mamba,test,Terrain,Wind III,0.343,0.060,542
+Learnable MLP replacement,test,Hover,Wind III,0.092,0.010,544
+Learnable MLP replacement,test,Figure-8,Wind III,0.145,0.066,544
+Learnable MLP replacement,test,Spiral,Wind III,0.147,0.013,544
+Learnable MLP replacement,test,Sin-forward,Wind III,0.135,0.016,544
+Learnable MLP replacement,test,Terrain,Wind III,0.128,0.013,544
+Force-Vector Memory,test,Hover,Wind III,0.139,0.018,545
+Force-Vector Memory,test,Figure-8,Wind III,0.202,0.025,545
+Force-Vector Memory,test,Spiral,Wind III,0.210,0.026,545
+Force-Vector Memory,test,Sin-forward,Wind III,0.190,0.024,545
+Force-Vector Memory,test,Terrain,Wind III,0.178,0.019,545
+AeroACE+MANN replacement,test,Hover,Wind III,0.228,0.031,546
+AeroACE+MANN replacement,test,Figure-8,Wind III,0.267,0.035,546
+AeroACE+MANN replacement,test,Spiral,Wind III,0.254,0.032,546
+AeroACE+MANN replacement,test,Sin-forward,Wind III,0.244,0.033,546
+AeroACE+MANN replacement,test,Terrain,Wind III,0.240,0.030,546

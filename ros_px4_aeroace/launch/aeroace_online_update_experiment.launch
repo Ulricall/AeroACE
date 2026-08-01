@@ -1,0 +1,48 @@
+<launch>
+  <arg name="mavros_ns" default="/mavros" />
+  <arg name="algorithm_code_dir" default="" />
+  <arg name="checkpoint" default="" />
+  <arg name="online_update" default="false" />
+  <arg name="flight_log_path" />
+  <arg name="trajectory" default="hover" />
+  <arg name="altitude" default="1.5" />
+  <arg name="takeoff_s" default="8.0" />
+  <arg name="hold_s" default="5.0" />
+  <arg name="motion_ramp_s" default="4.0" />
+  <arg name="motion_duration_s" default="60.0" />
+  <arg name="amplitude_x" default="0.5" />
+  <arg name="amplitude_y" default="0.5" />
+  <arg name="period_s" default="12.0" />
+  <arg name="auto_offboard" default="false" />
+  <arg name="auto_arm" default="false" />
+
+  <include file="$(find ros_px4_aeroace)/launch/aeroace_px4_offboard.launch">
+    <arg name="mavros_ns" value="$(arg mavros_ns)" />
+    <arg name="algorithm_code_dir" value="$(arg algorithm_code_dir)" />
+    <arg name="checkpoint" value="$(arg checkpoint)" />
+    <arg name="target_altitude" value="$(arg altitude)" />
+    <arg name="auto_offboard" value="$(arg auto_offboard)" />
+    <arg name="auto_arm" value="$(arg auto_arm)" />
+    <arg name="online_update" value="$(arg online_update)" />
+    <arg name="flight_log_path" value="$(arg flight_log_path)" />
+  </include>
+
+  <node pkg="ros_px4_aeroace"
+        type="aeroace_reference_trajectory_node.py"
+        name="aeroace_reference_trajectory"
+        output="screen">
+    <param name="odom_topic" value="$(arg mavros_ns)/local_position/odom" />
+    <param name="state_topic" value="$(arg mavros_ns)/state" />
+    <param name="reference_topic" value="/aeroace/reference" />
+    <param name="start_on_offboard" value="true" />
+    <param name="trajectory" value="$(arg trajectory)" />
+    <param name="altitude" value="$(arg altitude)" />
+    <param name="takeoff_s" value="$(arg takeoff_s)" />
+    <param name="hold_s" value="$(arg hold_s)" />
+    <param name="motion_ramp_s" value="$(arg motion_ramp_s)" />
+    <param name="motion_duration_s" value="$(arg motion_duration_s)" />
+    <param name="amplitude_x" value="$(arg amplitude_x)" />
+    <param name="amplitude_y" value="$(arg amplitude_y)" />
+    <param name="period_s" value="$(arg period_s)" />
+  </node>
+</launch>
