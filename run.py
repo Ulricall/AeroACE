@@ -693,6 +693,9 @@ def train_aero(
     print(f"Stage 2 complete. Mean RMSE: {np.mean(ace_error_list_2):.3f}")
 
     if save_path and hasattr(C, 'save'):
+        save_dir = os.path.dirname(save_path)
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
         C.save(save_path)
         print(f"Saved {name} to {save_path}")
 
@@ -2123,7 +2126,7 @@ def run_aeroace_variant(
         Wind_velo,
         stage1_eps=args.aero_stage1_eps,
         stage2_eps=args.aero_stage2_eps,
-        save_path=checkpoint_path,
+        save_path=checkpoint_path if args.aero_save_ckpt else None,
         name=display_name,
         stage2_wind_cfg=stage2_wind_cfg,
     )
@@ -2526,7 +2529,12 @@ if __name__ == '__main__':
                         help='Wind standard deviation used while constructing the Stage-2 Expert Dictionary.')
     parser.add_argument('--aero_init_seed', type=int, default=0,
                         help='Initialization seed shared across AeroACE ablation variants.')
-    parser.add_argument('--aero_ckpt', type=str, default='params/aeroace_trained.pt')
+    parser.add_argument('--aero_ckpt', type=str, default='params/aeroace_trained.pt',
+                        help='Checkpoint path used when --aero_save_ckpt is set.')
+    parser.add_argument('--aero_save_ckpt', type=int, default=0,
+                        help='Write the trained AeroACE checkpoint to '
+                             '--aero_ckpt. Off by default so that training '
+                             'does not overwrite the released checkpoints.')
     parser.add_argument('--aero_seq_len', type=int, default=10,
                         help='Input sequence length N for AeroACE history window.')
     parser.add_argument('--aero_dict_max_entries', type=int, default=10000,

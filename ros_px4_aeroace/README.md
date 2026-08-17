@@ -1,19 +1,25 @@
 # ros_px4_aeroace
 
-`ros_px4_aeroace` 是一个基于 `rospy + MAVROS` 的 PX4 实机运行适配包。节点复用本仓库 `controller.AeroACE` 的外环控制逻辑，发布 `/mavros/setpoint_raw/attitude`，由 PX4 执行底层姿态、角速度和电机闭环。
+A `rospy + MAVROS` adapter package for running AeroACE on a PX4 vehicle. The node
+reuses the outer-loop control logic of `controller.AeroACE` from this repository
+and publishes `/mavros/setpoint_raw/attitude`; PX4 closes the inner attitude,
+rate, and motor loops.
 
-## 控制接口
+## Control interface
 
-- 输入状态：`/mavros/local_position/odom`、`/mavros/local_position/velocity_local`、`/mavros/imu/data`
-- 输出控制：`mavros_msgs/AttitudeTarget`
-- AeroACE 输出：期望总推力 `T` 和姿态四元数 `q`
-- PX4 执行：OFFBOARD attitude/thrust setpoint
+- State input: `/mavros/local_position/odom`, `/mavros/local_position/velocity_local`, `/mavros/imu/data`
+- Control output: `mavros_msgs/AttitudeTarget`
+- AeroACE output: desired total thrust `T` and attitude quaternion `q`
+- PX4 execution: OFFBOARD attitude/thrust setpoint
 
-默认不会自动切 `OFFBOARD`，也不会自动解锁。先在 SITL 或拆桨状态下验证 topic、坐标系、推力标定和 failsafe。
+The node does not switch to `OFFBOARD` or arm automatically by default. Verify
+topics, frames, thrust calibration, and failsafe in SITL or with the propellers
+removed before flying.
 
-## 使用
+## Build
 
-把 `code_sub/ros_px4_aeroace` 放在 catkin 工作空间的 `src` 下，或在 `src` 下建立符号链接，然后编译：
+Place `code_sub/ros_px4_aeroace` under the `src` directory of a catkin workspace,
+or symlink it there, then build:
 
 ```bash
 cd ~/catkin_ws
@@ -21,13 +27,16 @@ catkin_make
 source devel/setup.bash
 ```
 
-启动 MAVROS 后运行：
+## Run
+
+Start MAVROS, then launch the node:
 
 ```bash
 roslaunch ros_px4_aeroace aeroace_px4_offboard.launch
 ```
 
-如果包不在本仓库 `code_sub/` 目录下，需要显式指定算法代码和 checkpoint：
+If the package is not located under this repository's `code_sub/` directory,
+specify the algorithm code and checkpoint paths explicitly:
 
 ```bash
 roslaunch ros_px4_aeroace aeroace_px4_offboard.launch \
@@ -35,35 +44,40 @@ roslaunch ros_px4_aeroace aeroace_px4_offboard.launch \
   checkpoint:=/path/to/AeroACE-PAMI/code_sub/params/aeroace_trained.pt
 ```
 
-实机自动切模式/解锁必须显式开启：
+Automatic mode switching and arming must be enabled explicitly:
 
 ```bash
 roslaunch ros_px4_aeroace aeroace_px4_offboard.launch \
   auto_offboard:=true auto_arm:=true
 ```
 
-## 参考轨迹
+## Reference trajectory
 
-没有外部参考时，节点使用内置起飞/悬停参考：保持启动时的 `x/y`，在 `takeoff_ramp_s` 秒内上升到 `takeoff_altitude`。
+With no external reference, the node uses a built-in takeoff/hover reference: it
+holds the `x/y` position recorded at startup and climbs to `takeoff_altitude`
+over `takeoff_ramp_s` seconds.
 
-也可以发布外部参考：
+External references can be published on:
 
-- `/aeroace/reference`：`trajectory_msgs/MultiDOFJointTrajectoryPoint`，支持位置、速度、加速度和 yaw
-- `/aeroace/pose_reference`：`geometry_msgs/PoseStamped`，只给位置和 yaw，速度/加速度置零
+- `/aeroace/reference`: `trajectory_msgs/MultiDOFJointTrajectoryPoint`, supporting position, velocity, acceleration, and yaw
+- `/aeroace/pose_reference`: `geometry_msgs/PoseStamped`, position and yaw only, with velocity and acceleration set to zero
 
-外部参考超时后会回到内置参考，超时时间由 `reference_timeout` 控制。
+The node falls back to the built-in reference after an external reference times
+out, as controlled by `reference_timeout`.
 
-## 关键标定参数
+## Calibration parameters
 
-- `hover_thrust`：PX4 悬停归一化油门，通常对应 `MPC_THR_HOVER`
-- `thrust_scale`：若大于 0，则直接用 `normalized_thrust = thrust_scale * thrust_newton`
-- `min_thrust` / `max_thrust`：发送给 PX4 的归一化推力限幅
-- `accel_source`：`velocity_derivative` 或 `imu`
-- `max_position_error` / `max_tilt_rad`：运行时安全门限
+- `hover_thrust`: PX4 normalized hover throttle, normally matching `MPC_THR_HOVER`
+- `thrust_scale`: if greater than 0, use `normalized_thrust = thrust_scale * thrust_newton` directly
+- `min_thrust` / `max_thrust`: normalized thrust limits sent to PX4
+- `accel_source`: `velocity_derivative` or `imu`
+- `max_position_error` / `max_tilt_rad`: runtime safety thresholds
 
 ## Online Expert Dictionary update
 
-默认 `aero_online_update: false`，因此主体实验对应的推理过程不会修改 dictionary。实机测试 online update 时需要显式开启，并为每次飞行指定不同的 CSV 路径：
+`aero_online_update` defaults to `false`, so inference does not modify the
+dictionary. To test online update on hardware, enable it explicitly and give each
+flight a separate CSV path:
 
 ```bash
 roslaunch ros_px4_aeroace aeroace_px4_offboard.launch \
@@ -71,12 +85,27 @@ roslaunch ros_px4_aeroace aeroace_px4_offboard.launch \
   flight_log_path:=/path/to/logs/online_01.csv
 ```
 
-实机更新使用的力信号为
-`m * a_world + m * g * e3 - T_cmd * R * e3`。默认从 IMU specific force 得到 `a_world`，完成机体系到世界系转换、重力去除和因果 LPF；`R` 来自里程计姿态，`T_cmd` 是上一控制周期发送给 PX4 的推力命令所对应的总推力。该路径不读取 ground-truth wind force 或外部力传感器。
+The force signal used for onboard updates is
+`m * a_world + m * g * e3 - T_cmd * R * e3`. By default `a_world` is derived from
+IMU specific force, with body-to-world rotation, gravity removal, and a causal
+LPF; `R` comes from the odometry attitude, and `T_cmd` is the total thrust
+corresponding to the thrust command sent to PX4 in the previous control cycle.
+This path does not read ground-truth wind force or an external force sensor.
 
-只有低 dictionary similarity 连续出现时才允许候选更新。非有限值和超过硬阈值的残差会被拒绝；其余候选先做力范数裁剪，再与最近残差窗口的逐轴中位数比较，并受最小更新间隔限制。部署前加载的 dictionary entries 保持只读；通过检查后，近重复的在线 entries 之间使用 EMA 合并，否则追加新条目。dictionary 满后拒绝新条目，不执行 pruning、confidence weighting 或 forgetting。
+A candidate update is allowed only when low dictionary similarity occurs on
+consecutive steps. Non-finite residuals and residuals above a hard threshold are
+rejected; remaining candidates are clipped by force norm, compared against the
+per-axis median of a recent residual window, and subject to a minimum update
+interval. Dictionary entries loaded before deployment remain read-only. Once a
+candidate passes, near-duplicate online entries are merged with an EMA, otherwise
+a new entry is appended. New entries are rejected once the dictionary is full; no
+pruning, confidence weighting, or forgetting is performed.
 
-`aeroace_online_update_experiment.launch` 同时启动控制器和可重复的 reference publisher。默认轨迹是平滑起飞后 hover；也可选择小幅 `circle` 或 `figure8`。static 和 online 飞行应使用完全相同的参数，只改变开关和日志路径：
+`aeroace_online_update_experiment.launch` starts the controller together with a
+repeatable reference publisher. The default trajectory is a smooth takeoff
+followed by hover; small `circle` and `figure8` trajectories are also available.
+Static and online flights should use identical parameters, changing only the
+switch and the log path:
 
 ```bash
 roslaunch ros_px4_aeroace aeroace_online_update_experiment.launch \
@@ -88,11 +117,16 @@ roslaunch ros_px4_aeroace aeroace_online_update_experiment.launch \
   flight_log_path:=/path/to/logs/online_01.csv
 ```
 
-建议按 static/online 交替顺序各运行五次，并保持 checkpoint、trajectory、reference 参数和测试区域一致。自动切换 OFFBOARD 和解锁仍然默认关闭。reference 轨迹和 online update 计数只在 UAV 已解锁且进入 OFFBOARD 后开始；切换前只发布当前位置用于 setpoint 预热。
+Automatic OFFBOARD switching and arming remain disabled by default. The reference
+trajectory and the online-update counters start only after the UAV is armed and
+has entered OFFBOARD; before the switch, the node publishes only the current
+position to prime the setpoint stream.
 
-每个 CSV 同时记录飞行状态、滤波后的世界系加速度、实测姿态、上一周期指令推力对应的模型推力、重构 residual、更新状态和累计拒绝计数。发布前应由操作者根据实机安全流程独立检查 static/online 开关、时间戳、累计计数和 dictionary 大小。
+Each CSV logs flight state, filtered world-frame acceleration, measured attitude,
+the model thrust corresponding to the previous cycle's commanded thrust, the
+reconstructed residual, update status, and cumulative rejection counts.
 
-调试 topic：
+Debug topics:
 
-- `~status`：状态和 failsafe 文本
-- `~debug`：在原有状态、推力、gate 和 residual 后附加 online update 开关、dictionary 大小、similarity、residual deviation、候选数和接受数
+- `~status`: state and failsafe text
+- `~debug`: state, thrust, gate, and residual, followed by the online-update flag, dictionary size, similarity, residual deviation, and candidate/accepted counts
