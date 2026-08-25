@@ -63,14 +63,10 @@ python run.py --model dmrac --trace fig8 --wind gale --test_rounds 10
 AeroACE:
 
 ```bash
-python run.py \
-  --model aeroace \
-  --trace fig8 \
-  --wind gale \
-  --test_rounds 10
+python run.py --model aeroace --trace fig8 --wind gale --test_rounds 10
 ```
 
-Evaluating the AeroACE checkpoint (test-only):
+Evaluating the AeroACE from checkpoint:
 
 ```bash
 python run_aeroace_checkpoint_evaluation.py \
