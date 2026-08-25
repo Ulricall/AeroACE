@@ -81,7 +81,7 @@ Evaluating the supplied AeroACE checkpoint (test-only):
 python run_aeroace_checkpoint_evaluation.py \
   --checkpoint params/aeroace_trained.pt \
   --output results/aeroace_checkpoint_evaluation \
-  --rounds 10 \
+  --rounds 10
 ```
 
 Test-only commands for supplied comparison checkpoints follow the source
