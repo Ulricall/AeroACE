@@ -33,9 +33,6 @@ rtnmpc
 mlmpc
 ```
 
-The fixed-gate and vanilla-GRU controller variants are exposed as
-`aeroace_fixed_gate` and `aeroace_vanilla_gru`.
-
 ## Environment
 
 Python 3.11.
@@ -63,19 +60,17 @@ python run.py --model contrast --trace fig8 --wind gale --test_rounds 10
 python run.py --model dmrac --trace fig8 --wind gale --test_rounds 10
 ```
 
-AeroACE (trains before testing):
+AeroACE:
 
 ```bash
 python run.py \
   --model aeroace \
   --trace fig8 \
   --wind gale \
-  --aero_stage1_eps 100 \
-  --aero_stage2_eps 10 \
   --test_rounds 10
 ```
 
-Evaluating the supplied AeroACE checkpoint (test-only):
+Evaluating the AeroACE checkpoint (test-only):
 
 ```bash
 python run_aeroace_checkpoint_evaluation.py \
@@ -84,8 +79,7 @@ python run_aeroace_checkpoint_evaluation.py \
   --rounds 10
 ```
 
-Test-only commands for supplied comparison checkpoints follow the source
-interfaces, for example:
+Test-only commands for supplied comparison checkpoints follow the source interfaces, for example:
 
 ```bash
 python run.py --model pitcn --pitcn_train 0 --pitcn_test 1 \
