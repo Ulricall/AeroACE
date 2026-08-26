@@ -3,6 +3,9 @@
 This repository contains the AeroACE algorithm, the comparisons reported in the
 paper, and the additional comparisons introduced during review.
 
+The PX4/MAVROS real-world deployment code is in
+[`ros_px4_aeroace/`](ros_px4_aeroace/).
+
 ## Implemented methods
 
 Paper method and main-paper comparisons:
