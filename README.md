@@ -6,12 +6,6 @@ paper, and the additional comparisons introduced during review.
 The PX4/MAVROS real-world deployment code is in
 [`ros_px4_aeroace/`](ros_px4_aeroace/).
 
-## License and citation
-
-This code is distributed under the [MIT License](LICENSE).
-The authors and software citation metadata are provided in
-[`CITATION.cff`](CITATION.cff).
-
 ## Implemented methods
 
 Paper method and main-paper comparisons:
