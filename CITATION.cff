@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite this code release."
+title: "AeroACE: source code, trained models and flight logs"
+type: software
+version: "1.0.0"
+license: MIT
+repository-code: "https://github.com/Ulricall/AeroACE"
+url: "https://github.com/Ulricall/AeroACE"
+abstract: >-
+  Source code for AeroACE and the comparison methods used in the study,
+  including simulation and checkpoint-evaluation scripts, trained model
+  weights, PX4/MAVROS deployment code, and wind-tunnel and outdoor flight logs.
+authors:
+  - family-names: Zhou
+    given-names: Jundong
+  - family-names: Yuan
+    given-names: Jiachen
+  - family-names: Shi
+    given-names: Wenxiang
+  - family-names: Zeng
+    given-names: Zhaoyu
+  - family-names: Yan
+    given-names: Chenqi
+  - family-names: He
+    given-names: Junhan
+  - family-names: Liu
+    given-names: Chengming
+  - family-names: Gu
+    given-names: Qinying
+  - family-names: Yang
+    given-names: Guang-Zhong
+  - family-names: Wang
+    given-names: Xinbing
+  - family-names: Ye
+    given-names: Nanyang
+keywords:
+  - UAV control
+  - quadrotors
+  - aerodynamic disturbance compensation
+  - learning-based control
+  - AeroACE

@@ -5,7 +5,7 @@
   <description>rospy/MAVROS offboard adapter for running AeroACE on PX4 vehicles.</description>
 
   <maintainer email="user@example.com">AeroACE Maintainers</maintainer>
-  <license>UNLICENSED</license>
+  <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 
