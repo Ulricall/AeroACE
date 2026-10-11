@@ -1,0 +1,86 @@
+# AeroACE release code
+
+This repository contains the AeroACE algorithm and the comparisons reported in the paper.
+
+The PX4/MAVROS real-world deployment code is in [`ros_px4_aeroace/`](ros_px4_aeroace/).
+
+## Implemented methods
+
+Paper method and comparison methods reported in the main text and supplementary:
+
+```text
+aeroace
+pid
+omac
+neural_fly
+ood_control
+decision_transformer
+dmrac
+neural_bem
+pitcn
+mann
+agile_full
+pi_transformer
+powerformer
+causal_transformer
+cluster_causal
+pinnsformer
+rtnmpc
+mlmpc
+```
+
+## Environment
+
+Python 3.11.
+
+```bash
+cd AeroACE
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+PyTorch wheels are platform-specific. If the pinned wheel is unavailable, install the appropriate PyTorch 2.1.x build first and then install the remaining requirements.
+
+## Running the algorithms
+
+Run commands from the repository root.
+
+Baseline models (examples):
+
+```bash
+python run.py --model pid --trace fig8 --wind gale --test_rounds 10
+python run.py --model contrast --trace fig8 --wind gale --test_rounds 10
+python run.py --model dmrac --trace fig8 --wind gale --test_rounds 10
+```
+
+AeroACE:
+
+```bash
+python run.py --model aeroace --trace fig8 --wind gale --test_rounds 10
+```
+
+Evaluating the AeroACE from checkpoint:
+
+```bash
+python run_aeroace_checkpoint_evaluation.py \
+  --checkpoint params/aeroace_trained.pt \
+  --output results/aeroace_checkpoint_evaluation \
+  --rounds 10
+```
+
+Test-only commands for supplied comparison checkpoints follow the source interfaces, for example:
+
+```bash
+python run.py --model pitcn --pitcn_train 0 --pitcn_test 1 \
+  --pitcn_load_ckpt params/pitcn.pt --trace fig8 --wind gale
+
+python run.py --model mann --mann_train 0 --mann_test 1 \
+  --mann_load_ckpt params/mann_feature.pt --trace fig8 --wind gale
+
+python run.py --model neural_bem --neuralbem_train 0 --neuralbem_test 1 \
+  --neuralbem_load_ckpt params/neuralbem.pt --trace fig8 --wind gale
+
+python run.py --model agile_full --agile_train 0 --agile_test 1 \
+  --agile_load_ckpt params/agile_full.pt --trace fig8 --wind gale
+```

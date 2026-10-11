@@ -1,0 +1,27 @@
+<launch>
+  <arg name="mavros_ns" default="/mavros" />
+  <arg name="algorithm_code_dir" default="" />
+  <arg name="checkpoint" default="" />
+  <arg name="target_altitude" default="1.5" />
+  <arg name="hover_thrust" default="0.5" />
+  <arg name="auto_offboard" default="false" />
+  <arg name="auto_arm" default="false" />
+  <arg name="online_update" default="false" />
+  <arg name="flight_log_path" default="" />
+
+  <node pkg="ros_px4_aeroace"
+        type="aeroace_px4_offboard_node.py"
+        name="aeroace_px4_offboard"
+        output="screen">
+    <rosparam command="load" file="$(find ros_px4_aeroace)/config/aeroace_px4.yaml" />
+    <param name="mavros_ns" value="$(arg mavros_ns)" />
+    <param name="algorithm_code_dir" value="$(arg algorithm_code_dir)" />
+    <param name="checkpoint" value="$(arg checkpoint)" />
+    <param name="takeoff_altitude" value="$(arg target_altitude)" />
+    <param name="hover_thrust" value="$(arg hover_thrust)" />
+    <param name="auto_offboard" value="$(arg auto_offboard)" />
+    <param name="auto_arm" value="$(arg auto_arm)" />
+    <param name="aero_online_update" value="$(arg online_update)" />
+    <param name="flight_log_path" value="$(arg flight_log_path)" />
+  </node>
+</launch>

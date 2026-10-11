@@ -1,0 +1,75 @@
+# Paths. Leave empty when this package stays under the repository's code_sub/ folder.
+algorithm_code_dir: ""
+checkpoint: ""
+
+# MAVROS/PX4 topics and loop timing.
+mavros_ns: "/mavros"
+odom_topic: "/mavros/local_position/odom"
+velocity_topic: "/mavros/local_position/velocity_local"
+imu_topic: "/mavros/imu/data"
+reference_topic: "/aeroace/reference"
+pose_reference_topic: "/aeroace/pose_reference"
+control_rate: 20.0
+odom_timeout: 0.5
+imu_timeout: 0.5
+velocity_timeout: 0.5
+reference_timeout: 0.5
+
+# Built-in takeoff/hold reference used when no external reference is fresh.
+target_position: [0.0, 0.0, 1.5]
+use_current_xy: true
+takeoff_altitude: 1.5
+takeoff_ramp_s: 8.0
+yaw: 0.0
+
+# Residual-force acceleration source for AeroACE.
+# imu rotates body-frame specific force to the world frame and removes gravity.
+# velocity_derivative remains available as a fallback/check.
+accel_source: "imu"
+accel_lpf_alpha: 0.35
+imu_linear_accel_is_specific_force: true
+
+# PX4 normalized thrust mapping.
+# If thrust_scale > 0, normalized_thrust = thrust_scale * thrust_newton.
+# Otherwise normalized_thrust = hover_thrust * thrust_newton / (mass * g).
+hover_thrust: 0.5
+thrust_scale: 0.0
+min_thrust: 0.05
+max_thrust: 0.85
+
+# Runtime safety gates.
+max_position_error: 4.0
+max_tilt_rad: 0.9
+stop_setpoints_on_failsafe: true
+latch_failsafe: true
+# Empty disables CSV logging. Set a writable path for each real-world flight.
+flight_log_path: ""
+
+# Mode/arming automation is disabled by default for real hardware.
+auto_offboard: false
+auto_arm: false
+arm_only_in_offboard: true
+offboard_mode: "OFFBOARD"
+setpoint_warmup_s: 3.0
+mode_request_period_s: 5.0
+
+# AeroACE inference settings must match the checkpoint unless intentionally changed.
+aero_seq_len: 10
+aero_dict_max_entries: 10000
+aero_dict_normalize_keys: false
+aero_dict_temperature: 1.0
+aero_dict_min_cosine_distance: 0.01
+aero_dict_max_entries_per_bucket: 1024
+aero_dict_ema_alpha: 0.9
+
+# Optional online Expert Dictionary update. Static inference remains the default.
+aero_online_update: false
+aero_online_anomaly_similarity_threshold: 0.9
+aero_online_min_anomaly_steps: 3
+aero_online_warmup_steps: 20
+aero_online_update_interval_steps: 10
+aero_online_residual_window: 5
+aero_online_residual_consistency_threshold: 6.0
+aero_online_force_clip_norm: 30.0
+aero_online_force_reject_norm: 60.0
+aero_online_require_anomaly: true
