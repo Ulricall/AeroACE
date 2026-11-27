@@ -63,9 +63,9 @@ python run.py --model aeroace --trace fig8 --wind gale --test_rounds 10
 Evaluating the AeroACE from checkpoint:
 
 ```bash
-python run_aeroace_checkpoint_evaluation.py \
+python eval_aeroace.py \
   --checkpoint params/aeroace_trained.pt \
-  --output results/aeroace_checkpoint_evaluation \
+  --output results/eval_aeroace \
   --rounds 10
 ```
 

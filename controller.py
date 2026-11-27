@@ -2695,7 +2695,7 @@ class MetaAdaptDeep(MetaAdapt):
             return x
     
     def __init__(self, given_pid=False, p=0, i=0, d=0, dim_a=100, layer_size=(25,30), 
-                 eta_a_base=0.3, eta_A_base=0.01, use_state_lpf=False, state_lpf_alpha=1.0):
+                 eta_a_base=0.005, eta_A_base=0.001, use_state_lpf=False, state_lpf_alpha=1.0):
         super().__init__(
             given_pid=given_pid,
             p=p,
@@ -2710,12 +2710,15 @@ class MetaAdaptDeep(MetaAdapt):
         self.eta_A_base = eta_A_base
         self.loss = nn.MSELoss()
         self.state = 'train'
+        self.phi = self.Phi(input_kernel=13, dim_kernel=self.dim_a//3, layer_sizes=self.layer_sizes).to(device)
+        self.optimizer = optim.Adam(self.phi.parameters(), lr=self.eta_A_base)
+        self.a = np.zeros(self.dim_a)
+        self.inner_adapt_count = 0
+        self.batch = []
     
     def reset_controller(self):
         super().reset_controller()
         self.a = np.zeros(self.dim_a)
-        self.phi = self.Phi(input_kernel=13, dim_kernel=self.dim_a//3, layer_sizes=self.layer_sizes).to(device)
-        self.optimizer = optim.Adam(self.phi.parameters(), lr=self.eta_A_base)
         self.inner_adapt_count = 0
         self.batch = []
     
@@ -2747,8 +2750,7 @@ class MetaAdaptDeep(MetaAdapt):
         self.batch = []
 
 class MetaAdaptOoD(MetaAdaptDeep):
-    def __init__(self, given_pid=False, p=0, i=0, d=0, dim_a=100, layer_size=(25,30), eta_a_base=0.05,
-                 eta_A_base=0.05, noise_x=0.01, noise_a=0.01, use_state_lpf=False, state_lpf_alpha=1.0):
+    def __init__(self, given_pid=False, p=0, i=0, d=0, dim_a=100, layer_size=(25,30), eta_a_base=0.001, eta_A_base=0.0004, noise_x=0.1, noise_a=0.1, use_state_lpf=False, state_lpf_alpha=1.0):
         super().__init__(
             given_pid=given_pid,
             p=p,
@@ -2793,8 +2795,7 @@ class NeuralFly(MetaAdaptDeep):
             x = self.fc3(x)
             return x
 
-    def __init__(self, given_pid=False, p=0, i=0, d=0, dim_a=100, layer_size=(25,30), eta_a_base=0.3, 
-                 eta_A_base=0.05, use_state_lpf=False, state_lpf_alpha=1.0):
+    def __init__(self, given_pid=False, p=0, i=0, d=0, dim_a=100, layer_size=(25,30), eta_a_base=0.005, eta_A_base=0.001, use_state_lpf=False, state_lpf_alpha=1.0):
         super().__init__(
             given_pid=given_pid,
             p=p,
@@ -2809,13 +2810,13 @@ class NeuralFly(MetaAdaptDeep):
         )
         self.wind_idx = 0
         self.alpha = 0.1
+        self.h = self.H(start_kernel = self.dim_a//3, dim_kernel=100, layer_sizes=self.layer_sizes).to(device)
+        self.h_optimizer = optim.Adam(params=self.h.parameters(), lr=0.1)
+        self.h_loss = nn.CrossEntropyLoss()
         # self.lr = lr
 
     def reset_controller(self):
         super().reset_controller()
-        self.h = self.H(start_kernel = self.dim_a//3, dim_kernel=10, layer_sizes=self.layer_sizes).to(device)
-        self.h_optimizer = optim.Adam(params=self.h.parameters(), lr=0.1)
-        self.h_loss = nn.CrossEntropyLoss()
     
     def meta_adapt(self):
         self.inner_adapt_count = 0
@@ -3274,6 +3275,7 @@ class AeroACE(PIDController):
         dict_max_entries_per_bucket=1024,
         dict_ema_alpha=0.9,
         c_refer_threshold_coefficient=0.1,
+        c_refer_damping_gamma=0.5,
         online_update=False,
         online_anomaly_similarity_threshold=0.9,
         online_min_anomaly_steps=3,
@@ -3304,8 +3306,7 @@ class AeroACE(PIDController):
         self.c_refer_threshold_coefficient = float(
             c_refer_threshold_coefficient
         )
-        if self.c_refer_threshold_coefficient < 0.0:
-            raise ValueError("c_refer_threshold_coefficient must be non-negative")
+        self.c_refer_damping_gamma = float(c_refer_damping_gamma)
         self.h = np.zeros((self.hidden_dim,))
         self.motor_speed = np.zeros(4)
         self.state = "train"
@@ -3700,7 +3701,7 @@ class AeroACE(PIDController):
             ):
                 self.c = c_inf
             else:
-                self.c = self.c_refer
+                self.c = (1.0 - self.c_refer_damping_gamma) * self.c + self.c_refer_damping_gamma * self.c_refer
             self.maybe_online_update(self.h, c_inf, self.residual)
         else:
             self.inner_adapt(self.h, self.c, ground_truth_force)

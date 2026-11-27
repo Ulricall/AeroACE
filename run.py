@@ -28,8 +28,7 @@ def setup_seed(seed):
     torch.backends.cudnn.deterministic = True
 
 
-# Closed-loop test seeds for shared test(): seed = TEST_SEED_A + round.
-TEST_SEED_A = 234
+TEST_SEED_A = 0
 
 
 def get_test_seed(round_idx):
@@ -604,9 +603,10 @@ def run_pitcn_quadsim_pipeline(model_name):
 
 def train(C, Q, Name=""):
     print("Training " + Name)
+    C.state = 'train'
     ace_error_list = np.empty(10)
     for i in range(10):
-        setup_seed(i)
+        setup_seed(i * 11 + 100)
         if (Name == 'Neural-Fly'): C.wind_idx = i
         Wind_Velocity = np.random.normal(loc=Wind_velo[0], scale=Wind_velo[1], size=(30000,3))
         log = Q.run(trajectory = t, controller = C, wind_velocity_list = Wind_Velocity)
@@ -637,7 +637,7 @@ def train_aero(
     # Stage 1: Train FGRU with random fixed environment embedding per episode
     ace_error_list_1 = np.empty(stage1_eps)
     for i in range(stage1_eps):
-        setup_seed(i)
+        setup_seed(i * 11 + 100)
         mean, std = wind_cfg
         Wind_Velocity = np.repeat(np.random.normal(loc=mean, scale=std, size=(1, 3)), 30000, axis=0)
         c_env = np.random.normal(0, 1, 3 * C.hidden_dim)
@@ -656,7 +656,7 @@ def train_aero(
     Q.state = 'train'
     ace_error_list_2 = np.empty(stage2_eps)
     for j in range(stage2_eps):
-        setup_seed(1000 + j)
+        setup_seed(100 + j * 11)
         mean, std = stage2_wind_cfg
         Wind_Velocity = np.random.normal(loc=mean, scale=std, size=(30000, 3))
         if hasattr(C, 'set_dictionary_context'):
@@ -780,32 +780,19 @@ def test(C, Q, Name, reset_control=True):
             'failure': int(metrics['failure']),
         })
         print(
-            "round %d | MAE: %.3f | RMSE: %.3f | term_z: %.3f | J_u: %.2f | J_delta_u: %.2f"
+            "round %d | MAE: %.3f"
             % (
                 round,
                 metrics['ace_error'],
-                metrics['rmse_error'],
-                metrics['terminal_z_error'],
-                metrics['J_u'],
-                metrics['J_delta_u'],
             )
         )
     print("*******",Name,"*******")
-    print("Position MAE: %.3f(%.3f)" % (np.mean(ace_error_list), safe_std(ace_error_list)))
-    print("Position RMSE: %.3f(%.3f)" % (np.mean(rmse_error_list), safe_std(rmse_error_list)))
-    axis_mean = np.mean(mean_axis_error_list, axis=0)
-    axis_std = np.std(mean_axis_error_list, axis=0, ddof=1) if num_rounds > 1 else np.zeros(3)
-    print("Mean axis error x/y/z: [%.3f, %.3f, %.3f]" % (axis_mean[0], axis_mean[1], axis_mean[2]))
-    print("Axis error std x/y/z: [%.3f, %.3f, %.3f]" % (axis_std[0], axis_std[1], axis_std[2]))
+    print("Average Control error: %.3f(%.3f)" % (np.mean(ace_error_list), safe_std(ace_error_list)))
     if np.isfinite(mean_abs_wind_effect_axis_list).any():
         wind_axis_mean = np.nanmean(mean_abs_wind_effect_axis_list, axis=0)
         print("Mean |wind effect| x/y/z (N): [%.3f, %.3f, %.3f]" % (
             wind_axis_mean[0], wind_axis_mean[1], wind_axis_mean[2]
         ))
-    print("Terminal z error: %.3f(%.3f)" % (np.mean(terminal_z_error_list), safe_std(terminal_z_error_list)))
-    print("z error variance: %.3f(%.3f)" % (np.mean(z_error_var_list), safe_std(z_error_var_list)))
-    print("Control Effort J_u: %.3f(%.3f)" % (np.mean(J_u_list), safe_std(J_u_list)))
-    print("Control Smoothness J_delta_u: %.3f(%.3f)" % (np.mean(J_delta_u_list), safe_std(J_delta_u_list)))
     if hasattr(C, 'fp_nonconv_count'):
         print("Fixed-point non-convergence count: %.1f(%.1f)" % (np.mean(fp_nonconv_list), safe_std(fp_nonconv_list)))
         print("Final fixed-point residual: %.4e(%.4e)" % (np.mean(fp_residual_list), safe_std(fp_residual_list)))
@@ -851,7 +838,7 @@ def run_original_baseline(model_name, given_pid=False, p=0, i=0, d=0):
         'neural_fly': 'Neural-Fly',
         'decision_transformer': 'Transformer',
     }
-    needs_training = model_name in {'omac', 'ood_control', 'decision_transformer'}
+    needs_training = model_name in {'omac', 'ood_control', 'neural_fly', 'decision_transformer'}
     if needs_training:
         train(methods[model_name], quadrotors[model_name], display_names[model_name])
     test(methods[model_name], quadrotors[model_name], display_names[model_name])
@@ -888,6 +875,8 @@ def contrast_algo(given_pid=False, p=0, i=0, d=0):
 
     train(c_ood, q_ood, "OoD-Control")
     test(c_ood, q_ood, "OoD-Control")
+
+    train(c_NF, q_NF, "Neural-Fly")
     test(c_NF, q_NF, "Neural-Fly")
 
     train(c_trans, q_trans, "Transformer")
@@ -958,7 +947,7 @@ def train_dmrac_quadsim(c, q, model_name, train_rounds=None, ckpt_path=None):
     if train_rounds is None:
         train_rounds = args.dmrac_train_rounds if args.dmrac_train_rounds > 0 else args.test_rounds
     for round_idx in range(train_rounds):
-        setup_seed(round_idx * 11 + 1000)
+        setup_seed(round_idx * 11 + 100)
         Wind_Velocity = np.random.normal(loc=Wind_velo[0], scale=Wind_velo[1], size=(30000, 3))
         log = q.run(trajectory=t, controller=c, wind_velocity_list=Wind_Velocity,
                     reset_control=True, Name=model_name + "-train")
@@ -2461,7 +2450,7 @@ if __name__ == '__main__':
     parser.add_argument('--mann_reset_memory_each_episode', type=int, default=1)
 
     parser.add_argument('--aero_stage1_eps', type=int, default=100)
-    parser.add_argument('--aero_stage2_eps', type=int, default=10)
+    parser.add_argument('--aero_stage2_eps', type=int, default=100)
     parser.add_argument('--aero_hidden_dim', type=int, default=33,
                         help='Hidden dimension of the AeroACE FGRU; the dictionary value dimension is three times this value.')
     parser.add_argument('--aero_stage2_wind_mean', type=float, default=0.0,

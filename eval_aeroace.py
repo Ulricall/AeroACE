@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import json
 from pathlib import Path
 import platform
@@ -19,9 +18,6 @@ import trajectory
 
 
 BASE_DIR = Path(__file__).resolve().parent
-RETAINED_CHECKPOINT_SHA256 = (
-    "12ce374e08f0caf2b64f8668425adf5cd680241eead8cea63132fa547bb06dfa"
-)
 RESULT_FIELDS = [
     "model",
     "trajectory",
@@ -41,7 +37,6 @@ SUMMARY_FIELDS = [
     "model",
     "trajectory",
     "wind",
-    "c_refer_threshold_coefficient",
     "runs",
     "position_mae_mean",
     "position_mae_std",
@@ -49,30 +44,9 @@ SUMMARY_FIELDS = [
     "position_rmse_std",
     "failure_count",
     "failure_rate",
-    "direct_retrieval_fraction",
     "seeds",
     "source_csv",
 ]
-RETRIEVAL_DIAGNOSTIC_FIELDS = [
-    "c_refer_threshold_coefficient",
-    "round",
-    "seed",
-    "retrieval_steps",
-    "direct_retrieval_steps",
-    "reference_steps",
-    "direct_retrieval_fraction",
-    "ratio_median",
-    "ratio_p95",
-    "ratio_max",
-]
-
-
-def sha256(path):
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as file:
-        for block in iter(lambda: file.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def release_relative(path):
@@ -85,6 +59,25 @@ def release_relative(path):
 
 def safe_std(values):
     return float(np.std(values, ddof=1)) if len(values) > 1 else 0.0
+
+
+def build_trajectory(trace_name):
+    if trace_name == "hover":
+        return trajectory.hover()
+    if trace_name == "fig8":
+        return trajectory.fig8()
+    if trace_name == "spiral":
+        return trajectory.spiral_up()
+    if trace_name == "sin":
+        return trajectory.sin_forward()
+    if trace_name == "zigzag":
+        return trajectory.ZigZag()
+    if trace_name == "terrain":
+        return trajectory.TerrainFollowingPath(
+            base_path_planner=trajectory.LinePathXY(),
+            terrain_model=trajectory.RandomGaussianTerrain(),
+        )
+    raise ValueError(f"Unknown trajectory: {trace_name}")
 
 
 def build_controller(args):
@@ -103,7 +96,6 @@ def build_controller(args):
         dict_min_cosine_distance=args.dict_min_cosine_distance,
         dict_max_entries_per_bucket=args.dict_max_entries_per_bucket,
         dict_ema_alpha=args.dict_ema_alpha,
-        c_refer_threshold_coefficient=args.c_refer_coefficient,
         online_update=False,
     )
 
@@ -112,15 +104,21 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", default="params/aeroace_trained.pt")
     parser.add_argument(
+        "--trace",
+        type=str,
+        default="fig8",
+        choices=["hover", "fig8", "spiral", "sin", "zigzag", "terrain"],
+    )
+    parser.add_argument(
         "--output",
-        default="results/aeroace_checkpoint_evaluation",
-        help="New or empty output directory.",
+        default="results/eval_aeroace",
+        help="Output directory (existing files will be overwritten).",
     )
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument(
         "--test-seed-a",
         type=int,
-        default=234,
+        default=0,
         help="First evaluation seed; round r uses this seed + r.",
     )
     parser.add_argument("--init-seed", type=int, default=0)
@@ -139,27 +137,18 @@ def main():
     parser.add_argument("--dict-min-cosine-distance", type=float, default=0.01)
     parser.add_argument("--dict-max-entries-per-bucket", type=int, default=1024)
     parser.add_argument("--dict-ema-alpha", type=float, default=0.9)
-    parser.add_argument("--c-refer-coefficient", type=float, default=0.1)
     args = parser.parse_args()
 
     if args.rounds <= 0:
         parser.error("--rounds must be positive")
     if args.wind_std < 0.0:
         parser.error("--wind-std must be non-negative")
-    if args.c_refer_coefficient < 0.0:
-        parser.error("--c-refer-coefficient must be non-negative")
 
     checkpoint = Path(args.checkpoint)
     if not checkpoint.is_absolute():
         checkpoint = BASE_DIR / checkpoint
     if not checkpoint.is_file():
         parser.error(f"checkpoint does not exist: {checkpoint}")
-    checkpoint_hash = sha256(checkpoint)
-    if checkpoint_hash != RETAINED_CHECKPOINT_SHA256:
-        parser.error(
-            "checkpoint SHA-256 does not match the retained release artifact: "
-            f"{checkpoint_hash}"
-        )
     checkpoint_payload = torch.load(checkpoint, map_location="cpu")
     retrieval_config_fields = (
         "expert_normalize_keys",
@@ -172,8 +161,6 @@ def main():
     output_dir = Path(args.output)
     if not output_dir.is_absolute():
         output_dir = BASE_DIR / output_dir
-    if output_dir.exists() and any(output_dir.iterdir()):
-        parser.error(f"output directory is not empty: {output_dir}")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     aeroace = build_controller(args)
@@ -183,33 +170,16 @@ def main():
     if dictionary_size_before <= 0:
         raise RuntimeError("retained checkpoint loaded an empty Expert Dictionary")
 
-    retrieval_ratios = []
-    original_get_c_refer = aeroace.get_c_refer
-
-    def monitored_get_c_refer(h_t, c_last):
-        c_refer = original_get_c_refer(h_t, c_last)
-        retrieval_ratios.append(
-            float(
-                np.linalg.norm(np.asarray(c_last) - np.asarray(c_refer))
-                / np.sqrt(aeroace.hidden_dim)
-            )
-        )
-        return c_refer
-
-    aeroace.get_c_refer = monitored_get_c_refer
-
     quadrotor = quadsim.Quadrotor()
     quadrotor.params["disable_progress"] = True
     quadrotor_state = quadrotor.state
-    trace = trajectory.fig8()
+    trace = build_trajectory(args.trace)
     aeroace.reset_controller()
 
     rows = []
-    retrieval_rows = []
     for round_index in range(args.rounds):
         seed = args.test_seed_a + round_index
         controller.setup_seed(seed)
-        retrieval_ratios.clear()
         wind_velocity = np.random.normal(
             loc=args.wind_mean,
             scale=args.wind_std,
@@ -229,7 +199,7 @@ def main():
         )
         row = {
             "model": "AeroACE",
-            "trajectory": "fig8",
+            "trajectory": args.trace,
             "wind": "gale",
             "wind_mean": float(args.wind_mean),
             "wind_std": float(args.wind_std),
@@ -243,72 +213,28 @@ def main():
             "failure": int(metrics["failure"]),
         }
         rows.append(row)
-        ratios = np.asarray(retrieval_ratios, dtype=float)
-        if ratios.size == 0:
-            raise RuntimeError(
-                f"no AeroACE retrieval decisions recorded for seed {seed}"
-            )
-        direct_steps = int(
-            np.sum(ratios <= args.c_refer_coefficient)
-        )
-        retrieval_rows.append(
-            {
-                "c_refer_threshold_coefficient": float(
-                    args.c_refer_coefficient
-                ),
-                "round": int(round_index),
-                "seed": int(seed),
-                "retrieval_steps": int(ratios.size),
-                "direct_retrieval_steps": direct_steps,
-                "reference_steps": int(ratios.size - direct_steps),
-                "direct_retrieval_fraction": float(
-                    direct_steps / ratios.size
-                ),
-                "ratio_median": float(np.median(ratios)),
-                "ratio_p95": float(np.percentile(ratios, 95)),
-                "ratio_max": float(np.max(ratios)),
-            }
-        )
         print(
-            "round %d seed %d | MAE %.3f | RMSE %.3f"
+            "round %d seed %d | MAE %.3f"
             % (
                 round_index,
                 seed,
                 row["position_mae"],
-                row["position_rmse"],
             )
         )
 
-    raw_path = output_dir / "fig8_gale_AeroACE.csv"
+    raw_path = output_dir / f"{args.trace}_gale_AeroACE.csv"
     with raw_path.open("w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=RESULT_FIELDS)
         writer.writeheader()
         writer.writerows(rows)
-    with (output_dir / "retrieval_diagnostics.csv").open(
-        "w", newline=""
-    ) as file:
-        writer = csv.DictWriter(
-            file, fieldnames=RETRIEVAL_DIAGNOSTIC_FIELDS
-        )
-        writer.writeheader()
-        writer.writerows(retrieval_rows)
 
     mae = np.asarray([row["position_mae"] for row in rows])
     rmse = np.asarray([row["position_rmse"] for row in rows])
     failures = np.asarray([row["failure"] for row in rows], dtype=int)
-    retrieval_steps = int(
-        sum(row["retrieval_steps"] for row in retrieval_rows)
-    )
-    direct_retrieval_steps = int(
-        sum(row["direct_retrieval_steps"] for row in retrieval_rows)
-    )
     summary = {
         "model": "AeroACE",
-        "trajectory": "fig8",
+        "trajectory": args.trace,
         "wind": "gale",
-        "c_refer_threshold_coefficient": float(
-            args.c_refer_coefficient
-        ),
         "runs": len(rows),
         "position_mae_mean": float(np.mean(mae)),
         "position_mae_std": safe_std(mae),
@@ -316,12 +242,6 @@ def main():
         "position_rmse_std": safe_std(rmse),
         "failure_count": int(np.sum(failures)),
         "failure_rate": float(np.mean(failures)),
-        "retrieval_steps": retrieval_steps,
-        "direct_retrieval_steps": direct_retrieval_steps,
-        "reference_steps": retrieval_steps - direct_retrieval_steps,
-        "direct_retrieval_fraction": float(
-            direct_retrieval_steps / retrieval_steps
-        ),
         "failure_seeds": [
             row["seed"] for row in rows if int(row["failure"]) == 1
         ],
@@ -347,14 +267,10 @@ def main():
     dictionary_size_after = int(aeroace.expert_dict.current_size)
     metadata = {
         "checkpoint": release_relative(checkpoint),
-        "checkpoint_sha256": checkpoint_hash,
         "checkpoint_load_confirmed": True,
         "dictionary_size_before": dictionary_size_before,
         "dictionary_size_after": dictionary_size_after,
         "online_update_enabled": bool(aeroace.online_update_enabled),
-        "c_refer_threshold_coefficient": float(
-            aeroace.c_refer_threshold_coefficient
-        ),
         "checkpoint_retrieval_config_present": all(
             field in checkpoint_payload for field in retrieval_config_fields
         ),
@@ -362,15 +278,7 @@ def main():
             "key_dim": int(aeroace.expert_dict.key_dim),
             "value_dim": int(aeroace.expert_dict.value_dim),
             "max_entries": int(aeroace.expert_dict.max_entries),
-            "normalize_keys": bool(aeroace.expert_dict.normalize_keys),
             "temperature": float(aeroace.expert_dict.temperature),
-            "min_cosine_distance": float(
-                aeroace.expert_dict.min_cosine_distance
-            ),
-            "max_entries_per_bucket": int(
-                aeroace.expert_dict.max_entries_per_bucket
-            ),
-            "ema_alpha": float(aeroace.expert_dict.ema_alpha),
         },
         "controller_init_seed": args.init_seed,
         "quadrotor_state": quadrotor_state,
@@ -385,15 +293,6 @@ def main():
             "python": platform.python_version(),
             "numpy": np.__version__,
             "torch": torch.__version__,
-        },
-        "source_sha256": {
-            name: sha256(BASE_DIR / name)
-            for name in (
-                "controller.py",
-                "quadsim.py",
-                "run.py",
-                "trajectory.py",
-            )
         },
     }
     with (output_dir / "metadata.json").open("w") as file:

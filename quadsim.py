@@ -48,7 +48,7 @@ class Quadrotor():
             self.Vwind += self.VwindList[self.wind_count] * dt
             self.wind_count += 1
             self.t_last_wind_update = t
-        self.Vwind = np.clip(self.Vwind, -25, 25)
+        self.Vwind = np.clip(self.Vwind, -20, 20)
         return self.Vwind
     
     def get_wind_effect(self, X, Z, t):
@@ -172,11 +172,11 @@ class Quadrotor():
             (X, t, Z, Xdot) = self.step(X=X, u=u, t=t, dt=self.params['dt'], Z=Z)
             X_meas = X
             X_meas[:3] += np.random.normal(scale=self.params['X_meas_noise'])
-            imu_noise = np.random.normal(scale=self.params['imu_meas_noise'], size=3)
+            imu_noise = np.random.normal(scale=self.params['imu_meas_noise'])
             outlier_probability = float(self.params.get('imu_outlier_probability', 0.0))
             if outlier_probability > 0.0 and np.random.random() < outlier_probability:
                 outlier_scale = float(self.params.get('imu_outlier_scale', 0.0))
-                imu_noise += np.random.normal(scale=outlier_scale, size=3)
+                imu_noise += np.random.normal(scale=outlier_scale)
             imu_meas = Xdot[7:10] + imu_noise
 
             if t>=t_readout:

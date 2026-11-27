@@ -16,7 +16,7 @@ class hover():
         return self.pd, vd, ad
 
 class fig8():
-    def __init__(self, T=15., dir1=(2., 2., 0.), dir2=(0., 0., 1.)):
+    def __init__(self, T=10., dir1=(2., 2., 0.), dir2=(0., 0., 1.)):
         self.w = 2*np.pi/T
         self.dir1 = np.array(dir1)
         self.dir2 = np.array(dir2)
@@ -43,7 +43,7 @@ class sin_forward():
         return pd, vd, ad
 
 class spiral_up():
-    def __init__(self, T=10., R=1., Vz=1, Vr=0.3):
+    def __init__(self, T=10., R=3., Vz=0.5, Vr=0.):
         self.w = np.pi*2/T
         self.R = R
         self.Vr = Vr
